@@ -18,6 +18,6 @@ public class BloggingApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		System.out.println(this.passwordEncoder.encode("1234"));
+		System.out.println(this.passwordEncoder.encode("newpass"));
 	}
 }
