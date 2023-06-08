@@ -1,12 +1,17 @@
 package com.backend.blogging.serviceimplementation;
 
+import com.backend.blogging.config.AppConstants;
+import com.backend.blogging.entities.Role;
 import com.backend.blogging.entities.User;
+import com.backend.blogging.repository.RoleRepository;
 import com.backend.blogging.repository.UserRepository;
 import com.backend.blogging.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserServiceImplementation implements UserService {
@@ -14,6 +19,14 @@ public class UserServiceImplementation implements UserService {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private RoleRepository roleRepository;
+
+   /* @Autowired
+     AppConstants appConstants;*/
 
     @Override
     public User createUser(User user) {
@@ -43,6 +56,17 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
+    public User saveUser(User saveUser) {
+
+        User user=new User();
+        user=userRepository.save(saveUser);
+        user.setPassword(this.passwordEncoder.encode(saveUser.getPassword()));
+        Role role= this.roleRepository.findById(AppConstants.NORMAL_USER).get();
+        user.getRole().add(role);
+        return user;
+    }
+
+    @Override
     public void deleteUser(int userId) throws Exception {
         User user=userRepository.findById(userId).orElseThrow(()->new Exception("User id is not found."));
         userRepository.deleteById(userId);
@@ -55,5 +79,6 @@ public class UserServiceImplementation implements UserService {
     @Override
     public User getSingleUser(int userId) {
         return userRepository.findById(userId).get();
+
     }
 }

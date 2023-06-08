@@ -20,6 +20,7 @@ public interface UserService {
 
     User updatePassword(User user,int userId);
 
+    User saveUser(User saveUser);
 
 
 

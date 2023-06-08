@@ -1,12 +1,16 @@
 package com.backend.blogging.controller;
 
+import com.backend.blogging.entities.User;
+import com.backend.blogging.exception.ApiExceptiom;
 import com.backend.blogging.payload.JwtAuthRequest;
 import com.backend.blogging.payload.JwtAuthResponse;
 import com.backend.blogging.security.JwtTokenHelper;
+import com.backend.blogging.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -26,6 +30,9 @@ public class AuthController {
     private UserDetailsService userDetailsService;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private AuthenticationManager authenticationManager;
 
     @PostMapping("/login")
@@ -43,11 +50,19 @@ public class AuthController {
              try {
                  this.authenticationManager.authenticate(upat);
              }
-             catch (Exception e)
+             catch (BadCredentialsException e)
              {
-                 System.out.println("Invalide username and password......");
-                 throw new Exception("Invalide username and password.");
+
+                 throw new ApiExceptiom("Invalid user name and password!!!.");
              }
+    }
+
+    @PostMapping("/allRegister")
+    public ResponseEntity<User> registerUsers(@RequestBody User user)
+    {
+        User saveUser=new User();
+        saveUser=this.userService.saveUser(user);
+        return new ResponseEntity<>(saveUser,HttpStatus.OK);
     }
 
 }
